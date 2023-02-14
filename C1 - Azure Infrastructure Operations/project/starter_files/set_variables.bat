@@ -1,0 +1,5 @@
+@echo off
+set ARM_CLIENT_ID=d52ddfa7-140e-4d05-b93b-d3e10187552a
+set ARM_CLIENT_SECRET=_pX8Q~PSIw94qQGXlwLkOSg32nHlkYlZpdGeFbhW
+set ARM_SUBSCRIPTION_ID=30c1f4c4-d5ae-42d7-91ba-0e2ecbff42fd
+set

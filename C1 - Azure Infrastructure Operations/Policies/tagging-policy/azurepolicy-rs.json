@@ -1,0 +1,27 @@
+{
+    "properties": {
+        "displayName": "Enforces a tag on resource groups",
+        "mode": "All",
+        "description": "Enforces existence of a tag on resource groups.",
+        "metadata": {
+            "category": "Tags"
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Resources/subscriptions/resourceGroups"
+                    },
+                    {
+                        "field": "tags",
+                        "exists": "false"
+                    }
+                ]
+            },
+            "then": {
+                "effect": "deny"
+            }
+        }
+    }
+}

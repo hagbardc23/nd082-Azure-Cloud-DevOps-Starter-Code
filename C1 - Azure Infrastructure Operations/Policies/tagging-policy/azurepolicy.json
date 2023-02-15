@@ -6,18 +6,9 @@
         "metadata": {
             "category": "Tags"
         },
-        "parameters": {
-            "tagName": {
-                "type": "String",
-                "metadata": {
-                    "displayName": "Tag Name",
-                    "description": "Name of the tag, such as 'environment'"
-                }
-            }
-        },
         "policyRule": {
             "if": {
-                "field": "[concat('tags[', parameters('tagName'), ']')]",
+                "field": "tags",
                 "exists": "false"
             },
             "then": {

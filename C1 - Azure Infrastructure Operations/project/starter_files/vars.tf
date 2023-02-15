@@ -8,10 +8,15 @@ variable "location" {
   default     = "West Europe"
 }
 
-/* variable "ressource_group" {
-  description = "Ressource Group of Udacity classe"
+
+variable "image_name" {
+  description = "VM Image name"
+  default     = "HeloWorldWebServerImage"
+}
+variable "image_ressource_group" {
+  description = "Ressource Group of the vm image"
   default     = "default-rg"
-} */
+}
 
 variable "tags" {
   description = "Map of the tags to use for the resources that are deployed"

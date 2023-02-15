@@ -11,11 +11,17 @@ terraform {
 
 provider "azurerm" {
   features {}
+
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
+  client_id       = var.client_id
+  client_secret   = var.client_secret
 }
 
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}-rg"
   location = var.location
+  tags     = var.tags
 }
 
 resource "azurerm_virtual_network" "main" {
@@ -23,6 +29,7 @@ resource "azurerm_virtual_network" "main" {
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  tags                = var.tags
 }
 
 resource "azurerm_subnet" "internal" {
@@ -30,6 +37,7 @@ resource "azurerm_subnet" "internal" {
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.2.0/24"]
+  tags                 = var.tags
 }
 
 resource "azurerm_public_ip" "pip" {
@@ -37,6 +45,7 @@ resource "azurerm_public_ip" "pip" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   allocation_method   = "Dynamic"
+  tags                = var.tags
 }
 
 resource "azurerm_network_interface" "main" {
@@ -50,6 +59,8 @@ resource "azurerm_network_interface" "main" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.pip.id
   }
+
+  tags = var.tags
 }
 
 resource "azurerm_network_interface" "internal" {
@@ -68,10 +79,7 @@ resource "azurerm_network_security_group" "main" {
   name                = "${var.prefix}-nsg"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-
-  tags {
-    project  = "udacity"
-  }
+  tags                = var.tags
 }
 
 resource "azurerm_network_security_rule" "outbound" {
@@ -133,7 +141,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   tags {
-    project  = "udacity"
+    project = "udacity"
   }
 }
 

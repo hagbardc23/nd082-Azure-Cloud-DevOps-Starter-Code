@@ -8,11 +8,11 @@ variable "location" {
   default     = "West Europe"
 }
 
-
 variable "image_name" {
   description = "VM Image name"
   default     = "HeloWorldWebServerImage"
 }
+
 variable "image_ressource_group" {
   description = "Ressource Group of the vm image"
   default     = "default-rg"
@@ -27,43 +27,29 @@ variable "tags" {
 }
 
 variable "application_port" {
-  description = "Port that you want to expose to the external load balancer"
+  description = "Port for netwrok security rules for access to the application"
   default     = 80
 }
 
-variable "ssh_port" {
-  description = "Port that you want to expose to the external load balancer"
-  default     = 22
-}
-
 variable "admin_user" {
-  description = "User name to use as the admin account on the VMs that will be part of the VM scale set"
+  description = "User name to use as the admin account on the VMs"
   default     = "azureuser"
 }
 
-variable "admin_password" {
-  description = "Default password for admin account"
-}
-
-
 variable "subscription_id" {
-  description = "Default password for admin account"
-  default     = env.ARM_SUBSCRIPTION_ID
+  description = "Azure Subscription Id"
 }
 
 variable "tenant_id" {
-  description = "Default password for admin account"
-  default     = env.ARM_TENANT_ID
+  description = "Azure Tenant Id"
 }
 
-variable "client_id " {
-  description = "Default password for admin account"
-  default     = env.env.ARM_CLIENT_ID
+variable "client_id" {
+  description = "Azure Service Principal Application Id"
 }
 
 variable "client_secret" {
-  description = "Default password for admin account"
-  default     = env.ARM_CLIENT_SECRET
+  description = "Azure Service Principal Application password"
 }
 
 variable "instance_count" {

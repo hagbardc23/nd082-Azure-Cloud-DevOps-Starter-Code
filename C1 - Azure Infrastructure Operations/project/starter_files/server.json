@@ -33,9 +33,9 @@
             "inline": [
 				"apt-get update",
                 "apt-get upgrade -y",
-				"apt install -y apache2",
-                "echo 'Hello, World!' > index.html",
-                "nohup busybox httpd -f -p 80 &"
+				"apt-get install -y apache2",
+                "rm /var/www/html/index.html",
+                "echo 'Hello, World!' > /var/www/html/index.html"
             ],
             "inline_shebang": "/bin/sh -x",
             "type": "shell",

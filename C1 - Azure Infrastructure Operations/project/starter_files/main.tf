@@ -101,39 +101,52 @@ resource "azurerm_network_security_group" "main" {
   tags = var.tags
 }
 
-resource "azurerm_network_security_rule" "outbound" {
-  name                        = "${var.prefix}-outbound_rule"
+resource "azurerm_network_security_rule" "http2lb" {
+  name                        = "${var.prefix}-http2lb"
   resource_group_name         = azurerm_resource_group.main.name
   network_security_group_name = azurerm_network_security_group.main.name
   priority                    = 100
-  direction                   = "Outbound"
+  direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = var.application_port
-  source_address_prefix       = azurerm_subnet.internal.address_prefixes[0]
-  destination_address_prefix  = "VirtualNetwork"
+  source_address_prefix       = "Internet"
+  destination_address_prefix  = "AzureLoadBalancer"
 
 }
-
-resource "azurerm_network_security_rule" "inbound" {
-  name                        = "${var.prefix}-inbound_rule"
+resource "azurerm_network_security_rule" "subnet" {
+  name                        = "${var.prefix}-subnet_access"
   resource_group_name         = azurerm_resource_group.main.name
   network_security_group_name = azurerm_network_security_group.main.name
   priority                    = 101
   direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = azurerm_subnet.internal.address_prefixes[0]
+  destination_address_prefix  = azurerm_subnet.internal.address_prefixes[0]
+
+}
+
+resource "azurerm_network_security_rule" "internet" {
+  name                        = "${var.prefix}-internet_rule"
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
+  priority                    = 102
+  direction                   = "Inbound"
   access                      = "Deny"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_range      = var.application_port
+  destination_port_range      = "*"
   source_address_prefix       = "Internet"
-  destination_address_prefix  = azurerm_subnet.internal.address_prefixes[0]
+  destination_address_prefix  = "VirtualNetwork"
 }
 
 resource "azurerm_network_interface_security_group_association" "main" {
   count                = var.instance_count
   network_interface_id = azurerm_network_interface.main[count.index].id
-  /* subnet_id                 = azurerm_subnet.internal.id */
   network_security_group_id = azurerm_network_security_group.main.id
 }
 
@@ -154,7 +167,6 @@ resource "azurerm_lb" "main" {
 }
 
 resource "azurerm_lb_backend_address_pool" "main" {
-  /* resource_group_name = azurerm_resource_group.main.name */
   name            = "${var.prefix}-lb-backend-ap"
   loadbalancer_id = azurerm_lb.main.id
 }
@@ -193,7 +205,6 @@ resource "azurerm_virtual_machine" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   vm_size             = "Standard_B1s"
-  /* admin_username      = var.admin_user */
 
   availability_set_id = azurerm_availability_set.avset.id
 
@@ -216,7 +227,6 @@ resource "azurerm_virtual_machine" "main" {
   os_profile {
     computer_name  = "${var.prefix}-vm${count.index}"
     admin_username = var.admin_user
-    /* admin_password = var.admin_password */
   }
   os_profile_linux_config {
     disable_password_authentication = true

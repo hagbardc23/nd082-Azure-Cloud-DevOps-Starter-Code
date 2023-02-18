@@ -1,17 +1,17 @@
 # Azure Infrastructure Operations Project: Deploying a scalable IaaS web server in Azure
 
 ## Introduction
-This project contains a sample of a scalable "Helo World" web application running in a virtual machine, which is built by a Packer template and provisioned by a Terraform template in Azure Cloud . The scaling of application deployment is customazable and can be configured in varibles file of Terraform.
+This project contains a sample of a scalable "Helo World" web application running in virtual machines, which are built by a Packer template and provisioned by a Terraform template in Azure Cloud . The scaling of application deployment is customizable and can be configured in variables file of Terraform.
 
 ## Getting Started
-An Azure account is neccessary for this project. This can ve easily created on [Azure Account](https://portal.azure.com). It is also advisable to install [Azure command line interface](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) locally.
+An Azure account is neccessary for this project. This can be easily created on [Azure Account](https://portal.azure.com). It is also advisable to install [Azure command line interface](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) locally.
 
 Some prerequisites need to be created and configured or at least queried  in Azure at first. You have to replace contained placeholders in the square brackets with appropriate values.
-1. Run az group create to create a resource group to hold the Packer image.
+1. Run `az group create` to create a resource group to hold the Packer image.
 ```bash
 az group create -n <resource_group_name> -l <location>
 ```
-2. Run az ad sp create-for-rbac to enable Packer to authenticate to Azure using a service principal. **Key points:** Make note of the output values (appId, client_secret, tenant_id).
+2. Run `az ad sp create-for-rbac` to enable Packer to authenticate to Azure using a service principal. Make note of the output values (appId, client_secret, tenant_id).
 ```bash
 az ad sp create-for-rbac --role Contributor --scopes /subscriptions/<subscription_id> --query "{ client_id: appId, client_secret: password, tenant_id: tenant }"
 ```
@@ -19,7 +19,7 @@ az ad sp create-for-rbac --role Contributor --scopes /subscriptions/<subscriptio
 ```bash
 az account show --query "{ subscription_id: id }"
 ```
-4. For easy of management of all resources beiing created by Terraform we enforces tagging for all resources of a resource group utilizing security policy in Azure. You can enforce additinally a similar rule for resource groups too, just use another rule document `azurepolicy.rules-rg.json` instead.
+4. For easy of management of all resources beiing created by Terraform we enforces tagging for all resources of a resource group utilizing security policy in Azure. You can enforce additionally a similar rule for resource groups too, just use another rule document `azurepolicy.rules-rg.json` instead.
 ```bash
 az policy definition create --name tagging-policy --display-name "Enforces a tag on resource" --description "Enforces existence of a tag on resources." --rules .\azurepolicy.rules.json --mode Indexed --metadata category=Tags
 
@@ -27,7 +27,7 @@ az policy assignment create --name 'tagging-policy-assignment' --display-name "E
 ``` 
  > A successfull assignment of policies can be checked by `az policy assignment list`. It should look like ![Image](az-policy-assignment-list_tagging-policy.jpg)
 
-For execution of Packer and Terraform you will also need both applicaiton installed locally. Please refer to Dependencies section for download of installation packages.
+For execution of Packer and Terraform you will also need both applicaiton installed locally. Please refer to Dependencies section for downloading of installation packages.
 ## Dependencies
 * Install [Packer](https://www.packer.io/downloads)
 * Install [Terraform](https://www.terraform.io/downloads.html)
@@ -73,13 +73,13 @@ Prior to the execution of `Packer` and `Terraform` templates you might do config
  ```bash
  terraform apply solution.plan
  ```
- 6. For the sake of removing provisioned application all instracture elements can be destroyed this way
+ 6. For the sake of removing provisioned application all infrastructure elements can be destroyed this way
  ```bash
  terraform destroy -var "client_id=<service principal application id>" -var "client_secret=<service principal application secret>" -var "subscription_id=<subscription_id>" -var "tenant_id=<tenant ID>"
  ```
 
 ## Output
-To make sure you didn't run into any failures please check there are no errors occured and the operations aren't rolled back.
+To make sure your executions were successful please check that there are no errors occured and the operations aren't rolled back.
 
 > For `packer build` execution the output should be like this one:
 ![Image](packer-build-output.jpg)
@@ -93,7 +93,7 @@ To make sure you didn't run into any failures please check there are no errors o
 ![Image](terraform-apply-output.jpg)
 
 
-> If everything run well, with `terraform output` you can get information abour full qualified domain name (FQDN) and server ip adress, where applicaiton is running. Put either FQDN or ip adress in the browser adress field and send an HTTP Request. The site responds with a Hello World Greeting.
+> If everything run well, with `terraform output` you can get information about full qualified domain name (FQDN) and server ip adress, where applicaiton is running. Put either FQDN or ip adress in the browser adress field and send an HTTP Request. The site responds with a Hello World Greeting.
 ![Image](browser-window-output.jpg)
     
 

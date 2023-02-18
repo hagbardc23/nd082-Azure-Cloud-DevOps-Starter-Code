@@ -25,15 +25,75 @@ az policy definition create --name tagging-policy --display-name "Enforces a tag
 
 az policy assignment create --name 'tagging-policy-assignment' --display-name "Enforces a tag on resource Assignment" --scope /subscriptions/<subscription_id> --policy /subscriptions/<subscription_id>/providers/Microsoft.Authorization/policyDefinitions/tagging-policy
 ``` 
+ > A successfull assignment of policies can be checked by `az policy assignment list`. It should look like ![Image](az-policy-assignment-list_tagging-policy.jpg)
+
 For execution of Packer and Terraform you will also need both applicaiton installed locally. Please refer to Dependencies section for download of installation packages.
 ## Dependencies
 * Install [Packer](https://www.packer.io/downloads)
 * Install [Terraform](https://www.terraform.io/downloads.html)
 
 ## Instructions
-Prior to the execution of `Packer` and `Terraform` templates you might do configuration of follwing parameters
 ### Customization 
+Prior to the execution of `Packer` and `Terraform` templates you might do configuration of following parameters.
+ >   server.json
+ - *managed_image_resource_group_name*:  
+    - name of resource group you previously created,
+ - *managed_image_name*: 
+    - name of the VM image
+ - *location*:  
+    - your nearest location. List of Azure location literals can be requested by `az account list-locations --query "[?not_null(metadata.latitude)] .{RegionName:regionalDisplayName}" --output table)`
+
+> var.tf
+- *prefix*:  
+    - prefix for consistent naming of all resources to be created for easier identification
+ - *location*: 
+    - the same as in `server.json`
+ - *image_name*:  
+    - the same as in `server.json`
+ - *image_ressource_group*:
+    - the same as in `server.json`
+ - *tags*
+    - tag for all resources to be created
+ - *instance_count*
+    - amount of instances of virtual machines to be created and run  
+ ### Templates' Execution
+ 1. Execute `packer init` in the folder where `server.json` resides to initialize Packer.
+ 2. In the same folder create image with `packer build` command and set values of variables to the ones determnined at the beginning. 
+ ```bash
+ packer build -var "client_id=<service principal application id>" -var "client_secret=<service principal application secret>" -var "subscription_id=<subscription_id>" server.json
+ ```
+ If any changes to the image are neccessary afterwards you will need to delete the image in Azure (e.g. `az image delete -n  <name of the VM-image> -g <resource group>`) and then reexecute the latter command.
+
+ 3. Execute `terraform init` in the folder where `*.tf` files reside to initialize Terraform.
+ 4. Create Terraform plan with the next command
+ ```bash
+ terraform plan -var "client_id=<service principal application id>" -var "client_secret=<service principal application secret>" -var "subscription_id=<subscription_id>" -var "tenant_id=<tenant ID>" -out solution.plan
+ ```
+ 5. After successfull creation of Terraform plan, it can be applied using 
+ ```bash
+ terraform apply solution.plan
+ ```
+ 6. For the sake of removing provisioned application all instracture elements can be destroyed this way
+ ```bash
+ terraform destroy -var "client_id=<service principal application id>" -var "client_secret=<service principal application secret>" -var "subscription_id=<subscription_id>" -var "tenant_id=<tenant ID>"
+ ```
 
 ## Output
-**Your words here**
+To make sure you didn't run into any failures please check there are no errors occured and the operations aren't rolled back.
+
+> For `packer build` execution the output should be like this one:
+![Image](packer-build-output.jpg)
+
+
+> For `terraform plan` execution a successful run  looks like this:
+![Image](terraform-plan-output.jpg)
+
+
+> For `terraform apply`execution you are fine, if your output is like this:
+![Image](terraform-apply-output.jpg)
+
+
+> If everything run well, with `terraform output` you can get information abour full qualified domain name (FQDN) and server ip adress, where applicaiton is running. Put either FQDN or ip adress in the browser adress field and send an HTTP Request. The site responds with a Hello World Greeting.
+![Image](browser-window-output.jpg)
+    
 
